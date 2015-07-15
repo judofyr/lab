@@ -4,8 +4,11 @@
 #include FT_FREETYPE_H
 #include FT_CACHE_H
 #include FT_SIZES_H
+#include FT_TRUETYPE_TABLES_H
 
 #include <hb.h>
+
+#include <ot/math.h>
 
 class Font {
 public:
@@ -29,6 +32,7 @@ public:
   ~Face();
 
   Font createFont(int pointSize);
+  OtMATH::Table mathTable();
 };
 
 class FontManager {

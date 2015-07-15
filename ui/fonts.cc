@@ -26,6 +26,25 @@ Font Face::createFont(int pointSize) {
   return Font(ft_face);
 }
 
+OtMATH::Table Face::mathTable() {
+  FT_ULong length = 0;
+  FT_Tag tag = FT_MAKE_TAG('M','A','T','H');
+
+  {
+    auto err = FT_Load_Sfnt_Table(ft_face, tag, 0, NULL, &length);
+    if (err) return OtMATH::Table();
+  }
+
+  OtMATH::Table table(length);
+
+  {
+    auto err = FT_Load_Sfnt_Table(ft_face, tag, 0, table.buffer(), &length);
+    if (err) return OtMATH::Table();
+  }
+
+  return table;
+}
+
 Font::Font(FT_Face f) {
   hb_font = hb_ft_font_create_referenced(f);
   auto &metrics = f->size->metrics;
@@ -41,4 +60,5 @@ Font::~Font() {
 FT_Face Font::ftFace() {
   return hb_ft_font_get_face(hb_font);
 }
+
 
