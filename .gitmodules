@@ -1,0 +1,12 @@
+[submodule "vendor/nanovg"]
+	path = vendor/nanovg
+	url = https://github.com/memononen/nanovg
+[submodule "vendor/freetype2"]
+	path = vendor/freetype2
+	url = git://git.sv.nongnu.org/freetype/freetype2.git
+[submodule "vendor/harfbuzz"]
+	path = vendor/harfbuzz
+	url = https://github.com/behdad/harfbuzz
+[submodule "vendor/gl3w"]
+	path = vendor/gl3w
+	url = https://github.com/skaslev/gl3w
