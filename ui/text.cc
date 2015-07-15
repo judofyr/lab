@@ -9,9 +9,10 @@ TextAtom::TextAtom(std::shared_ptr<Font> f, const char *t) : font(f) {
   hb_buffer_set_language(buf, hb_language_from_string("en", 2));
 
   hb_buffer_add_utf8(buf, t, -1, 0, -1);
-  hb_shape(font->hb_font, buf, nullptr, 0);
+  hb_shape(font->hbFont(), buf, nullptr, 0);
 
-  height = (font->ascender - font->descender) >> 6;
+  auto &metrics = font->ftSize()->metrics;
+  height = (metrics.ascender - metrics.descender) >> 6;
   width = 0;
 
   int w = 0;
@@ -34,10 +35,11 @@ void TextAtom::draw(PixelCanvas& c, Position pos) {
   hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(buf, &glyph_count);
 
   auto face = font->ftFace();
+  auto &metrics = font->ftSize()->metrics;
 
   // Measured in 26.6 pixels.
   int pen_x = 0;
-  int pen_y = font->ascender;
+  int pen_y = metrics.ascender;
 
   for (int i = 0; i < glyph_count; i++) {
     auto &gi = glyph_info[i];

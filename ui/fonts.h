@@ -11,15 +11,18 @@
 #include <ot/math.h>
 
 class Font {
-public:
+  FT_Size ft_size;
   hb_font_t* hb_font;
-  int ascender, descender, height;
+public:
 
-  Font(FT_Face);
-  FT_Face ftFace();
+  Font(FT_Face, int pointSize);
   Font(const Font&) = delete;
   Font(Font&&) = default;
   ~Font();
+
+  hb_font_t* hbFont();
+  FT_Face ftFace();
+  FT_Size ftSize();
 };
 
 class Face {
@@ -27,7 +30,7 @@ class Face {
 
 public:
   Face(FT_Face f) : ft_face(f) { }
-  Face(const Face&) = delete;
+  Face(const Face&);
   Face(Face&&) = default;
   ~Face();
 

@@ -16,14 +16,17 @@ Face FontManager::createFace(const char *filename) {
   return Face(ft_face);
 }
 
+Face::Face(const Face& other) {
+  ft_face = other.ft_face;
+  FT_Reference_Face(ft_face);
+}
+
 Face::~Face() {
   FT_Done_Face(ft_face);
 }
 
 Font Face::createFont(int pointSize) {
-  // TODO: Set DPI properly
-  assert(!FT_Set_Char_Size(ft_face, pointSize << 6, 0, 72*2, 72*2));
-  return Font(ft_face);
+  return Font(ft_face, pointSize);
 }
 
 OtMATH::Table Face::mathTable() {
@@ -45,20 +48,30 @@ OtMATH::Table Face::mathTable() {
   return table;
 }
 
-Font::Font(FT_Face f) {
+Font::Font(FT_Face f, int pointSize) {
+  assert(!FT_New_Size(f, &ft_size));
+  assert(!FT_Activate_Size(ft_size));
+  // TODO: Set DPI properly
+  assert(!FT_Set_Char_Size(f, pointSize << 6, 0, 72*2, 72*2));
   hb_font = hb_ft_font_create_referenced(f);
-  auto &metrics = f->size->metrics;
-  ascender = metrics.ascender;
-  descender = metrics.descender;
-  height = metrics.height;
 }
 
 Font::~Font() {
+  FT_Done_Size(ft_size);
   hb_font_destroy(hb_font);
 }
 
+hb_font_t* Font::hbFont() {
+  return hb_font;
+}
+
 FT_Face Font::ftFace() {
+  assert(!FT_Activate_Size(ft_size));
   return hb_ft_font_get_face(hb_font);
+}
+
+FT_Size Font::ftSize() {
+  return ft_size;
 }
 
 
