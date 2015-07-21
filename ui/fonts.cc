@@ -87,4 +87,8 @@ FT_Size Font::ftSize() {
   return ft_size;
 }
 
+int Font::unit2px(int unit) {
+  return ((uint64_t) ft_size->metrics.x_scale * (uint64_t) unit + (1<<15)) >> 16 >> 6;
+}
+
 

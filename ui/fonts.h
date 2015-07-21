@@ -26,6 +26,7 @@ public:
   hb_font_t* hbFont();
   FT_Face ftFace();
   FT_Size ftSize();
+  int unit2px(int);
 };
 
 class Face {
