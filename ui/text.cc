@@ -3,13 +3,15 @@
 #include <cassert>
 #include <algorithm>
 
+static auto hb_en = hb_language_from_string("en", 2);
+
 TextAtom::TextAtom(std::shared_ptr<Font> f, const char *t) : font(f) {
   font->activate();
 
   buf = hb_buffer_create();
   hb_buffer_set_direction(buf, HB_DIRECTION_LTR);
   hb_buffer_set_script(buf, HB_SCRIPT_LATIN);
-  hb_buffer_set_language(buf, hb_language_from_string("en", 2));
+  hb_buffer_set_language(buf, hb_en);
 
   hb_buffer_add_utf8(buf, t, -1, 0, -1);
   hb_shape(font->hbFont(), buf, nullptr, 0);
