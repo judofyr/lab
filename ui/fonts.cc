@@ -75,8 +75,11 @@ hb_font_t* Font::hbFont() {
   return hb_font;
 }
 
-FT_Face Font::ftFace() {
+void Font::activate() {
   assert(!FT_Activate_Size(ft_size));
+}
+
+FT_Face Font::ftFace() {
   return hb_ft_font_get_face(hb_font);
 }
 

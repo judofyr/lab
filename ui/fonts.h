@@ -22,6 +22,7 @@ public:
   Font(Font&&) = default;
   ~Font();
 
+  void activate();
   hb_font_t* hbFont();
   FT_Face ftFace();
   FT_Size ftSize();
