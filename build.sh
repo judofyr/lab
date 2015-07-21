@@ -24,10 +24,12 @@ LDFLAGS=""
 LDFLAGS="$LDFLAGS -L$HARFBUZZ/src/.libs -L$FREETYPE2/objs"
 
 LDFLAGS="$LDFLAGS $LIBS"
+DYLIBFLAGS="-dynamiclib -undefined dynamic_lookup"
+DYLIBEXT="dylib"
 
 mkdir -p build
 
-declare -a OBJS
+OBJS=()
 
 compile_cc() {
   local base="${1##*/}"
@@ -51,13 +53,22 @@ compile_cxx() {
   $CXX $CXXFLAGS -c -o "$obj" "$1"
 }
 
+clear_objs() {
+  OBJS=()
+}
+
 compile_cc "$GL3W/src/gl3w.c"
 compile_cc "$NANOVG/src/nanovg.c"
 compile_cxx ui/canvas.cc
 compile_cxx ui/atom.cc
 compile_cxx ui/fonts.cc
 compile_cxx ui/text.cc
+compile_cxx ui/math.cc
 compile_cxx main.cc
 
-$CXX $CXXFLAGS $LDFLAGS -o build/lab "${OBJS[@]}"
+$CXX $CXXFLAGS $LDFLAGS -o build/lab ${OBJS[@]}
+clear_objs
+
+compile_cxx physics/spring.cc physics
+$CXX $CXXFLAGS $LDFLAGS $DYLIBFLAGS -o build/spring.$DYLIBEXT ${OBJS[@]}
 

@@ -8,41 +8,11 @@
 #include "ui/canvas.h"
 #include "ui/layout.h"
 #include "ui/text.h"
+#include "ui/math.h"
 
-class Example : public StackLayout {
-  TextureAtom ta;
-  bool loaded = false;
+#include <memory>
 
-  virtual void layout() override {
-    auto vg = canvas->vg;
-
-    if (!loaded) {
-      TextAtom t(canvas->paragraphFont, "Hello");
-      ta.draw(*canvas, t);
-      loaded = true;
-    }
-
-    draw(ta);
-
-    {
-      auto r = takeSpace(500);
-      nvgBeginPath(vg);
-      nvgFillColor(vg, nvgRGBf(1.0, 0.0, 0.0));
-      nvgRect(vg, r.x, r.y, r.w, r.h);
-      nvgFill(vg);
-    }
-
-    takeSpace(100);
-
-    {
-      auto r = takeSpace(500);
-      nvgBeginPath(vg);
-      nvgFillColor(vg, nvgRGBf(0.0, 1.0, 0.0));
-      nvgRect(vg, r.x, r.y, r.w, r.h);
-      nvgFill(vg);
-    }
-  }
-};
+#include <dlfcn.h>
 
 int main(int argc, char **argv)
 {
@@ -66,14 +36,20 @@ int main(int argc, char **argv)
   glfwGetFramebufferSize(window, &width, &height);
   glViewport(0, 0, width, height);
 
+  auto lib = dlopen("build/spring.dylib", 0);
+  auto create = (Layout* (*)()) dlsym(lib, "create");
+
   auto c = new Canvas(vg);
-  auto ex = new Example;
+  auto ex = create();
   auto fm = new FontManager;
   auto font = fm
     ->createFace("/Library/Fonts/TeX Gyre/texgyrepagella-regular.otf")
     .createFont(16);
 
   c->setParagraphFont(std::move(font));
+
+  auto mathface = std::make_unique<Face>(fm->createFace("/Library/Fonts/TeX Gyre/texgyrepagella-math.otf"));
+  c->mathFace = std::move(mathface);
 
   int columnWidth = 500;
   Position start = {(width-columnWidth)/2, 0};

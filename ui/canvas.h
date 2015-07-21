@@ -11,6 +11,7 @@ class Canvas {
 public:
   NVGcontext* vg;
   std::shared_ptr<Font> paragraphFont;
+  std::unique_ptr<Face> mathFace;
 
   Canvas(NVGcontext *v) : vg(v) { }
 

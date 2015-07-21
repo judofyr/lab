@@ -6,6 +6,7 @@
 class Layout {
 public:
   virtual int draw(Canvas&, Position, int width) = 0;
+  virtual ~Layout() = default;
 };
 
 class StackLayout : public Layout {
