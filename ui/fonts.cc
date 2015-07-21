@@ -21,12 +21,22 @@ Face::Face(const Face& other) {
   FT_Reference_Face(ft_face);
 }
 
+Face::Face(Face&& other) {
+  ft_face = other.ft_face;
+  other.ft_face = nullptr;
+}
+
 Face::~Face() {
-  FT_Done_Face(ft_face);
+  if (ft_face)
+    FT_Done_Face(ft_face);
 }
 
 Font Face::createFont(int pointSize) {
   return Font(ft_face, pointSize);
+}
+
+std::shared_ptr<Font> Face::createSharedFont(int pointSize) {
+  return std::make_shared<Font>(ft_face, pointSize);
 }
 
 OtMATH::Table Face::mathTable() {

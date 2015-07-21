@@ -10,6 +10,8 @@
 
 #include <ot/math.h>
 
+#include <memory>
+
 class Font {
   FT_Size ft_size;
   hb_font_t* hb_font;
@@ -31,10 +33,11 @@ class Face {
 public:
   Face(FT_Face f) : ft_face(f) { }
   Face(const Face&);
-  Face(Face&&) = default;
+  Face(Face&&);
   ~Face();
 
   Font createFont(int pointSize);
+  std::shared_ptr<Font> createSharedFont(int pointSize);
   OtMATH::Table mathTable();
 };
 
