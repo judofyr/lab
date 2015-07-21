@@ -6,12 +6,15 @@
 class Atom {
 public:
   int width, height;
+  int descender = 0;
+
   virtual void draw(Canvas&, Position) = 0;
 };
 
 class PixelAtom {
 public:
   int width, height;
+  int descender = 0;
 
   virtual void draw(PixelCanvas& data, Position) = 0;
 };
