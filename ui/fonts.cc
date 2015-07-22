@@ -88,7 +88,9 @@ FT_Size Font::ftSize() {
 }
 
 int Font::unit2px(int unit) {
-  return ((uint64_t) ft_size->metrics.x_scale * (uint64_t) unit + (1<<15)) >> 16 >> 6;
+  // We use the 1<<(x-1) pattern to round up.
+  auto fixed = ((uint64_t) ft_size->metrics.x_scale * (uint64_t) unit + (1<<15)) >> 16;
+  return (fixed + (1<<5)) >> 6;
 }
 
 
