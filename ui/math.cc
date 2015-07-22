@@ -3,19 +3,15 @@
 #define PXCONST(name) \
   font.unit2px(constants->name.value())
 
+#define SPEC_ALL \
+  SPEC(D, 0) SPEC(D, 1) \
+  SPEC(T, 0) SPEC(T, 1) \
+  SPEC(S, 0) SPEC(S, 1) \
+  SPEC(SS, 0) SPEC(SS, 1)
+
 using namespace Math;
 
-template<int S>
-TextAtom Renderer::text(const char* text) {
-  return TextAtom(fonts[S], text);
-}
-
-template TextAtom Renderer::text<Display>(const char* text);
-template TextAtom Renderer::text<Text>(const char* text);
-template TextAtom Renderer::text<Script>(const char* text);
-template TextAtom Renderer::text<ScriptScript>(const char* text);
-
-template<int S>
+template<int St>
 struct FractionMeasurement {
   int thickness;
   int axis_height;
@@ -24,15 +20,13 @@ struct FractionMeasurement {
   int num_gap_min;
   int den_gap_min;
 
-  static_assert(S == Display || S == Text, "Fractions must be either Display or Text");
-
   FractionMeasurement(Renderer& r) {
-    auto &font = *r.fonts[S];
+    auto &font = *r.fonts[St];
     auto constants = r.table.header()->constants();
     thickness = PXCONST(fractionRuleThickness);
     axis_height = PXCONST(axisHeight);
 
-    if (S == Display) {
+    if (St == D) {
       shift_up = PXCONST(fractionNumeratorDisplayStyleShiftUp);
       shift_down = PXCONST(fractionDenominatorDisplayStyleShiftDown);
       num_gap_min = PXCONST(fractionNumDisplayStyleGapMin);
@@ -46,9 +40,9 @@ struct FractionMeasurement {
   }
 };
 
-template<int S>
-Fraction Renderer::fraction(PixelAtom& num, PixelAtom& den) {
-  auto m = FractionMeasurement<S>(*this);
+template<int St, int C>
+void Fraction<St, C>::setup(Renderer& r) {
+  auto m = FractionMeasurement<St>(r);
 
   int rule_top = -m.axis_height - m.thickness/2;
   int rule_bot = rule_top + m.thickness;
@@ -66,19 +60,21 @@ Fraction Renderer::fraction(PixelAtom& num, PixelAtom& den) {
     den_top = rule_bot + m.den_gap_min;
   }
 
-  int rule_y = rule_top - num_top;
-  int den_y = den_top - num_top;
-  int baseline_y = -num_top;
+  thickness = m.thickness;
+  rule_y = rule_top - num_top;
+  den_y = den_top - num_top;
 
-  return Fraction(num, den, m.thickness, rule_y, den_y, baseline_y);
+  int baseline_y = 0 - num_top;
+
+  this->width = std::max(num.width, den.width);
+  this->height = den_y + den.height;
+  this->descender = this->height - baseline_y;
 }
 
-template Fraction Renderer::fraction<Text>(PixelAtom&, PixelAtom&);
-template Fraction Renderer::fraction<Display>(PixelAtom&, PixelAtom&);
-
-void Fraction::draw(PixelCanvas& c, Position pos) {
+template<int St, int C>
+void Fraction<St, C>::draw(PixelCanvas& c, Position pos) {
   // Draw line
-  for (int x = 0; x < width; x++) {
+  for (int x = 0; x < this->width; x++) {
     for (int y = 0; y < thickness; y++) {
       auto p = c.pixel(pos, x, y+rule_y);
       c.setAlpha(p, 0xFF);
@@ -88,12 +84,12 @@ void Fraction::draw(PixelCanvas& c, Position pos) {
   // Center alignment
   int den_x;
 
-  if (num.width < width) {
-    int num_extra_x = (width - num.width)/2;
+  if (num.width < this->width) {
+    int num_extra_x = (this->width - num.width)/2;
     pos.x += num_extra_x;
     den_x = -num_extra_x;
   } else {
-    den_x = (width - den.width)/2;
+    den_x = (this->width - den.width)/2;
   }
 
   num.draw(c, pos);
@@ -103,4 +99,11 @@ void Fraction::draw(PixelCanvas& c, Position pos) {
 
   den.draw(c, pos);
 }
+
+
+#define SPEC(St, C) \
+  template void Fraction<St, C>::setup(Renderer&);\
+  template void Fraction<St, C>::draw(PixelCanvas&, Position);
+
+SPEC_ALL
 

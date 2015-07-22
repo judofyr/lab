@@ -2,6 +2,8 @@
 #include <ui/math.h>
 #include <ui/text.h>
 
+using namespace Math;
+
 class Spring : public StackLayout {
   TextureAtom ta;
   bool loaded = false;
@@ -11,16 +13,25 @@ class Spring : public StackLayout {
   virtual void layout() override {
     auto vg = canvas->vg;
 
+    takeSpace(100);
+
     if (!loaded) {
       math = new Math::Renderer(*canvas->mathFace);
-      auto t1 = math->text<Math::Display>("Hello");
-      auto t2 = math->text<Math::Display>("123");
-      auto frac = math->fraction<Math::Text>(t1, t2);
-      ta.draw(*canvas, frac);
+      auto h = Math::Helper(*math);
+      auto t1 = h.text<T>("1");
+      auto t2 = h.text<T,1>("2");
+      auto frac = h.frac<D>(t1, t2);
+      auto t3 = h.text<D>(" + 5 - 4");
+      HBox<2, D> box;
+      box.add(frac);
+      box.add(t3);
+      ta.draw(*canvas, box);
       loaded = true;
     }
 
     draw(ta);
+
+    takeSpace(100);
 
     {
       auto r = takeSpace(500);
