@@ -5,7 +5,8 @@
 
 class Atom {
 public:
-  int width, height;
+  int width = 0;
+  int height = 0;
   int descender = 0;
 
   virtual void draw(Canvas&, Position) = 0;
@@ -13,7 +14,8 @@ public:
 
 class PixelAtom {
 public:
-  int width, height;
+  int width = 0;
+  int height = 0;
   int descender = 0;
 
   virtual void draw(PixelCanvas& data, Position) = 0;
