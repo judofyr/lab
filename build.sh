@@ -21,7 +21,7 @@ CXXFLAGS="-std=c++14 $CFLAGS"
 CXXFLAGS="$CXXFLAGS `pkg-config --cflags glfw3`"
 
 LDFLAGS=""
-LDFLAGS="$LDFLAGS -L$HARFBUZZ/src/.libs -L$FREETYPE2/objs"
+LDFLAGS="$LDFLAGS -Lbuild/host"
 
 LDFLAGS="$LDFLAGS $LIBS"
 DYLIBFLAGS="-dynamiclib -undefined dynamic_lookup"
