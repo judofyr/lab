@@ -16,6 +16,12 @@
 
 int main(int argc, char **argv)
 {
+  auto lib = dlopen("build/spring.dylib", 0);
+  if (lib == nullptr) {
+    printf("%s\n", dlerror());
+    return 0;
+  }
+
   if (!glfwInit())
     return 1;
 
@@ -36,7 +42,6 @@ int main(int argc, char **argv)
   glfwGetFramebufferSize(window, &width, &height);
   glViewport(0, 0, width, height);
 
-  auto lib = dlopen("build/spring.dylib", 0);
   auto create = (Layout* (*)()) dlsym(lib, "create");
 
   auto c = new Canvas(vg);
